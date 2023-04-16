@@ -2,6 +2,8 @@ package com.example.backend.Products;
 
 //import com.example.backend.User.User;
 import com.example.backend.Category.Category;
+import com.example.backend.Image.Image;
+import com.example.backend.Image.ImageUtility;
 import com.example.backend.proSecurity.user.CurrentUser;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -26,7 +29,21 @@ public class ProductController {
 
     @GetMapping("/advertisement")
     public List<Product> getAllProduct() {
-        return (List<Product>) productRepository.findAll();
+        List<Product> productList = (List<Product>) productRepository.findAll();
+
+        ArrayList<Product> products = new ArrayList<>();
+
+        for(Product product : productList){
+            product.setImage(
+                    Image.builder()
+                            .id(product.getImage().getId())
+                            .type(product.getImage().getType())
+                            .image(ImageUtility.decompressImage(product.getImage().getImage())).build());
+
+            products.add(product);
+        }
+
+        return products;
     }
 
     @PostMapping("/advertisement")

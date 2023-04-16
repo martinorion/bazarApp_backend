@@ -13,10 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -50,8 +54,7 @@ public class UserAccountController {
 
 
     @RequestMapping(value="/register", method =  RequestMethod.POST)
-    public ResponseEntity<Object> registerUser(@RequestBody UserEntity user)
-    {
+    public ResponseEntity<Object> registerUser(@RequestBody UserEntity user) throws MessagingException {
         Map<String, Object> response = new HashMap<String, Object>();
 
         UserEntity existingUser = userRepository.findByEmailIgnoreCase(user.getEmail());
@@ -90,14 +93,20 @@ public class UserAccountController {
 
             confirmationTokenRepository.save(confirmationToken);
 
-            SimpleMailMessage mailMessage = new SimpleMailMessage();
-            mailMessage.setTo(user.getEmail());
-            mailMessage.setSubject("Dokončite registráciu!");
-            mailMessage.setFrom("BAZARAPP");
-            mailMessage.setText("Tu potvrďte svoju registráciu: "
-                    +"http://localhost:4200/confirmVerification?token="+confirmationToken.getConfirmationToken());
+            MimeMessage message = emailSenderService.javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setTo(user.getEmail());
+            helper.setSubject("Dokončite registráciu!");
+            helper.setFrom(new InternetAddress("BAZARAPP"));
 
-            emailSenderService.sendEmail(mailMessage);
+            String htmlContent = "<html><body>"
+                    + "<h1>WEBOVÝ BAZÁR</h1>"
+                    + "<h2>Potvrďte svoju registráciu:</h2>"
+                    + "<a href='https://bazar-mh.vercel.app/confirmVerification?token=" + confirmationToken.getConfirmationToken() + "'>Potvrdiť registráciu</a>"
+                    + "</body></html>";
+            helper.setText(htmlContent, true);
+
+            emailSenderService.sendEmail(message);
         }
 
         response.put("status", "success");

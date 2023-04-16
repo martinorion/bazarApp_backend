@@ -11,7 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import javax.transaction.Transactional;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,18 +32,29 @@ public class ImageAnotherController {
 
     @PostMapping("/upload/anotherImage")
     public void uploadImage(@RequestParam("image") MultipartFile[] files) throws IOException {
-        System.out.println(Arrays.toString(files));
+
+        boolean first = true;
 
         if (files.length != 0) {
-        for (MultipartFile file : files) {
-            imageAnotherRepository.save(ImageAnother.builder()
-                    .type(file.getContentType())
-                    .imageMain(imageRepository.findTopByOrderByIdDesc().get())
-                    .image(ImageUtility.compressAndReduceImageQuality(file.getBytes(), file.getContentType())).build());
+            for (MultipartFile file : files) {
+                BufferedImage image = ImageIO.read(new ByteArrayInputStream(file.getBytes()));
+                if (image != null) {
+                    if (first) {
+                        imageRepository.save(Image.builder()
+                                .type(file.getContentType())
+                                .image(ImageUtility.compressAndReduceImageQuality(file.getBytes(), file.getContentType())).build());
+                        first = false;
+                    }
+                    else {
+                        imageAnotherRepository.save(ImageAnother.builder()
+                                .type(file.getContentType())
+                                .imageMain(imageRepository.findTopByOrderByIdDesc().get())
+                                .image(ImageUtility.compressAndReduceImageQuality(file.getBytes(), file.getContentType())).build());
+                    }
 
-
+                }
+            }
         }
-    }
     }
 
     @Transactional

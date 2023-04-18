@@ -1,5 +1,7 @@
 package com.example.backend.Favourite;
 
+import com.example.backend.Image.Image;
+import com.example.backend.Image.ImageUtility;
 import com.example.backend.Products.Product;
 import com.example.backend.proSecurity.user.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,21 @@ public class FavouriteController {
 
     @GetMapping("/favourite")
     public ArrayList<Product> getUsersFavourite(@AuthenticationPrincipal CurrentUser currentUser) {
-        return favouriteService.getMeFavourite(currentUser);
+        List<Product> productList = favouriteService.getMeFavourite(currentUser);
+
+        ArrayList<Product> products = new ArrayList<>();
+
+        for(Product product : productList){
+            product.setImage(
+                    Image.builder()
+                            .id(product.getImage().getId())
+                            .type(product.getImage().getType())
+                            .image(ImageUtility.decompressImage(product.getImage().getImage())).build());
+
+            products.add(product);
+        }
+
+        return products;
     }
 
     @PostMapping("/removefavourite")

@@ -73,7 +73,22 @@ public class ProductController {
 
     @GetMapping("/myproducts")
     public List<Product> showOnlyMe(@AuthenticationPrincipal CurrentUser currentUser){
-        return productService.showOnlyUsersProducts(currentUser);
+
+        List<Product> productList = productService.showOnlyUsersProducts(currentUser);
+
+        ArrayList<Product> products = new ArrayList<>();
+
+        for(Product product : productList){
+            product.setImage(
+                    Image.builder()
+                            .id(product.getImage().getId())
+                            .type(product.getImage().getType())
+                            .image(ImageUtility.decompressImage(product.getImage().getImage())).build());
+
+            products.add(product);
+        }
+
+        return products;
     }
 
     @PostMapping("/editproduct")
@@ -83,8 +98,24 @@ public class ProductController {
 
     @GetMapping("/getcategoryinformation")
     List<Product> returnProductsByCategory(){
-       return productService.getCurrentCategories();
+
+        List<Product> productList = productService.getCurrentCategories();
+
+       ArrayList<Product> products = new ArrayList<>();
+
+        for(Product product : productList){
+            product.setImage(
+                    Image.builder()
+                            .id(product.getImage().getId())
+                            .type(product.getImage().getType())
+                            .image(ImageUtility.decompressImage(product.getImage().getImage())).build());
+
+            products.add(product);
+        }
+
+        return products;
     }
+
 
     @PostMapping("/postcategoryinformation")
     void postProductsByCategory(@RequestBody Category category){

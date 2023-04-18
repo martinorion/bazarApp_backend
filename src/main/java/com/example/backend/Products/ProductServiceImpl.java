@@ -214,7 +214,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void returnProductsByCategory(Category category){
+
         setCurrentCategories(productRepository.findAllByKindOfCategory(category));
+
     }
 
 

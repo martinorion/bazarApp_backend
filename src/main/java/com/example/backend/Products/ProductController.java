@@ -97,10 +97,10 @@ public class ProductController {
     }
 
     @GetMapping("/getcategoryinformation")
-    List<Product> returnProductsByCategory(){
+    List<Product> returnProductsByCategory(@RequestBody Category category){
 
-        List<Product> productList = productService.getCurrentCategories();
-
+        List<Product> productList;
+        productList =  productRepository.findAllByKindOfCategory(category);
        ArrayList<Product> products = new ArrayList<>();
 
         for(Product product : productList){

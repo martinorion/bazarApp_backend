@@ -96,7 +96,7 @@ public class ProductController {
         productService.editProduct(product);
     }
 
-    @GetMapping("/getcategoryinformation")
+    @PostMapping("/getcategoryinformation")
     List<Product> returnProductsByCategory(@RequestBody Category category){
 
         List<Product> productList;

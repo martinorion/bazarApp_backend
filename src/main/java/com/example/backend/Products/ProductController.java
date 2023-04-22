@@ -74,21 +74,7 @@ public class ProductController {
     @GetMapping("/myproducts")
     public List<Product> showOnlyMe(@AuthenticationPrincipal CurrentUser currentUser){
 
-        List<Product> productList = productService.showOnlyUsersProducts(currentUser);
-
-        ArrayList<Product> products = new ArrayList<>();
-
-        for(Product product : productList){
-            product.setImage(
-                    Image.builder()
-                            .id(product.getImage().getId())
-                            .type(product.getImage().getType())
-                            .image(ImageUtility.decompressImage(product.getImage().getImage())).build());
-
-            products.add(product);
-        }
-
-        return products;
+        return productService.showOnlyUsersProducts(currentUser);
     }
 
     @PostMapping("/editproduct")

@@ -91,7 +91,7 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins("https://bazar-mh.vercel.app")
-//                        .allowedOrigins("http://localhost:4200")
+                        .allowedOrigins("http://localhost:4200")
                         .allowedMethods("*")
                         .allowCredentials(true);
             }
